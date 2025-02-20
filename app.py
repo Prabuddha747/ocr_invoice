@@ -81,14 +81,14 @@ if uploaded_files:
     save_to_pickle(invoice_data)
     st.success("✅ All invoices saved in 'invoice_data.pkl'")
 
-if st.button("📂 Load All Saved Invoice Data"):
-    loaded_data = load_from_pickle()
+# if st.button("📂 Load All Saved Invoice Data"):
+#     loaded_data = load_from_pickle()
     
-    if loaded_data:
-        st.subheader("📂 Previously Saved Invoices")
-        for invoice_id, data in loaded_data.items():
-            st.markdown(f"### 🏷️ Invoice: {data['filename']}")
-            st.write(data["invoice_details"])
-            st.markdown("---")
-    else:
-        st.error("⚠️ No previously saved invoice data found.")
+#     if loaded_data:
+#         st.subheader("📂 Previously Saved Invoices")
+#         for invoice_id, data in loaded_data.items():
+#             st.markdown(f"### 🏷️ Invoice: {data['filename']}")
+#             st.write(data["invoice_details"])
+#             st.markdown("---")
+#     else:
+#         st.error("⚠️ No previously saved invoice data found.")
