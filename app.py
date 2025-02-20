@@ -5,6 +5,7 @@ import pickle
 from PIL import Image
 import io
 import hashlib
+import PyPDF2
 
 st.set_page_config(page_title="Welcome to Invoice Analyzer")
 
@@ -19,10 +20,8 @@ def get_gemini_response(image, prompt):
     response = model.generate_content([image, prompt])
     return response.text if response else "Error: No response from LLM."
 
-def generate_invoice_id(image):
-    image_bytes = io.BytesIO()
-    image.save(image_bytes, format="PNG")
-    return hashlib.md5(image_bytes.getvalue()).hexdigest()
+def generate_invoice_id(content):
+    return hashlib.md5(content.encode()).hexdigest()
 
 def save_to_pickle(data, filename="invoice_data.pkl"):
     existing_data = load_from_pickle(filename)
@@ -40,7 +39,7 @@ def load_from_pickle(filename="invoice_data.pkl"):
 
 st.header("📄 Invoice Analyzer")
 
-uploaded_files = st.file_uploader("Upload invoice images...", type=["jpg", "jpeg", "png","pdf"], accept_multiple_files=True)
+uploaded_files = st.file_uploader("Upload invoice images or PDFs...", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
 input_prompt = """
 You are an expert in understanding invoices.
@@ -52,17 +51,28 @@ if uploaded_files:
     invoice_data = {}
 
     for uploaded_file in uploaded_files:
-        image = Image.open(uploaded_file)
-        st.image(image, caption=f"📸 Uploaded: {uploaded_file.name}", use_container_width=True)
+        if uploaded_file.type in ["image/jpeg", "image/png", "image/jpg"]:
+            image = Image.open(uploaded_file)
+            st.image(image, caption=f"📸 Uploaded: {uploaded_file.name}", use_container_width=True)
+            content = image.tobytes()
+        
+        elif uploaded_file.type == "application/pdf":
+            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            content = "".join([page.extract_text() for page in pdf_reader.pages if page.extract_text()])
+            st.text_area(f"📄 Extracted text from {uploaded_file.name}", content, height=300)
+        
+        else:
+            st.error(f"Unsupported file type: {uploaded_file.type}")
+            continue
 
-        invoice_id = generate_invoice_id(image)
-
+        invoice_id = generate_invoice_id(content)
+        
         with st.spinner(f"⏳ Extracting details for {uploaded_file.name}..."):
-            response = get_gemini_response(image, input_prompt)
-
+            response = get_gemini_response(content, input_prompt)
+        
         st.subheader(f"📜 Extracted Details for {uploaded_file.name}")
         st.write(response)
-
+        
         invoice_data[invoice_id] = {
             "filename": uploaded_file.name,
             "invoice_details": response
