@@ -1,4 +1,5 @@
-import streamlit as st  # Import Streamlit before setting page config
+import streamlit as st
+import os# Import Streamlit before setting page config
 
 # Set Page Configuration (MUST BE FIRST)
 st.set_page_config(page_title="Welcome to Invoice Analyzer")
