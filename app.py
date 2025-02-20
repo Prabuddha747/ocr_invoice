@@ -40,7 +40,7 @@ def load_from_pickle(filename="invoice_data.pkl"):
 
 st.header("📄 Invoice Analyzer")
 
-uploaded_files = st.file_uploader("Upload invoice images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+uploaded_files = st.file_uploader("Upload invoice images...", type=["jpg", "jpeg", "png","pdf"], accept_multiple_files=True)
 
 input_prompt = """
 You are an expert in understanding invoices.
