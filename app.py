@@ -17,16 +17,16 @@ if not LLM_call:
 else:
     genai.configure(api_key=LLM_call)
 
-# Function to generate invoice ID (fix applied)
+# Function to generate a unique invoice ID
 def generate_invoice_id(content):
     if isinstance(content, str):  
-        return hashlib.md5(content.encode()).hexdigest()
+        return hashlib.md5(content.encode()).hexdigest()  # For text (PDFs)
     elif isinstance(content, bytes):  
-        return hashlib.md5(content).hexdigest()
+        return hashlib.md5(content).hexdigest()  # For images (JPG, PNG)
     else:
         raise ValueError("Unsupported content type for hashing")
 
-# Function to get response from Gemini AI
+# Function to get AI response from Gemini
 def get_gemini_response(image_or_text, prompt):
     model = genai.GenerativeModel("gemini-1.5-flash")  
     response = model.generate_content([image_or_text, prompt])
